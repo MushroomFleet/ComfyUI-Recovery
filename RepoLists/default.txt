@@ -1,0 +1,10 @@
+# ComfyUI Default Custom Node Repository List
+# One GitHub URL per line (lines starting with # are comments and will be ignored)
+
+# Example repositories (these are real ComfyUI custom node repositories)
+https://github.com/ltdrdata/ComfyUI-Manager
+https://github.com/cubiq/ComfyUI_IPAdapter_plus
+https://github.com/Fannovel16/comfyui_controlnet_aux
+https://github.com/BlenderNeko/ComfyUI_Noise
+https://github.com/Gourieff/comfyui-reactor-node
+https://github.com/ssitu/ComfyUI_UltimateSDUpscale

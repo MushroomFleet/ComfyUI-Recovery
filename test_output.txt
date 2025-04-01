@@ -1,0 +1,13 @@
+Testing module imports:
+  Importing settings... SUCCESS
+    Found classes: SettingsManager
+  Importing downloader... SUCCESS
+    Found classes: Downloader
+  Importing extractor... SUCCESS
+    Found classes: Extractor
+  Importing symlink_manager... SUCCESS
+    Found classes: SymlinkManager
+  Importing node_installer... SUCCESS
+    Found classes: List, NodeInstaller, Optional, Tuple
+
+Test result: PASSED

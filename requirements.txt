@@ -1,0 +1,4 @@
+# ComfyUI Recovery System dependencies
+requests>=2.25.0
+tqdm>=4.64.0
+py7zr>=0.20.0
