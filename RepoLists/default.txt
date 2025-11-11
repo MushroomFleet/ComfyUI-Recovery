@@ -6,7 +6,7 @@ https://github.com/ltdrdata/ComfyUI-Manager
 https://github.com/cubiq/ComfyUI_IPAdapter_plus
 https://github.com/Fannovel16/comfyui_controlnet_aux
 https://github.com/BlenderNeko/ComfyUI_Noise
-https://github.com/Gourieff/comfyui-reactor-node
+https://github.com/Gourieff/ComfyUI-ReActor
 https://github.com/ssitu/ComfyUI_UltimateSDUpscale
 https://github.com/MushroomFleet/ComfyUI-SCP-nodes
 https://github.com/MushroomFleet/DJZ-Nodes

@@ -270,3 +270,20 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## 🤝 Contributing
 
 Contributions are welcome! Feel free to submit issues or pull requests to improve the functionality or documentation.
+
+## 📚 Citation
+
+### Academic Citation
+If you use this codebase in your research or project, please cite:
+```bibtex
+@software{comfyui_recovery,
+  title = {ComfyUI Recovery System: Automated recovery and setup for ComfyUI Portable Windows installations},
+  author = {Drift Johnson},
+  year = {2025},
+  url = {https://github.com/MushroomFleet/ComfyUI-Recovery},
+  version = {1.0.0}
+}
+```
+
+### Donate
+[![Ko-Fi](https://cdn.ko-fi.com/cdn/kofi3.png?v=3)](https://ko-fi.com/driftjohnson)
