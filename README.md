@@ -2,7 +2,6 @@
 
 A complete system for automated recovery and setup of ComfyUI Portable Windows installations. This tool allows you to quickly rebuild ComfyUI with your custom configuration after a system failure or when setting up a new environment.
 
-![ComfyUI Logo](https://raw.githubusercontent.com/comfyanonymous/ComfyUI/master/web/favicon.ico)
 
 ## 🔍 Overview
 
@@ -287,3 +286,4 @@ If you use this codebase in your research or project, please cite:
 
 ### Donate
 [![Ko-Fi](https://cdn.ko-fi.com/cdn/kofi3.png?v=3)](https://ko-fi.com/driftjohnson)
+
