@@ -76,6 +76,29 @@ class NodeInstaller:
             logging.error(f"Error reading repository list: {e}")
             return False, f"Error reading repository list: {e}", []
     
+    def find_comfyui_base(self, install_path: str) -> str:
+        """
+        Find the actual ComfyUI base directory, handling different extraction structures.
+        
+        Args:
+            install_path: Path where ComfyUI is installed
+            
+        Returns:
+            str: Path to the ComfyUI base directory
+        """
+        # Check for nested structure (with parent dir)
+        nested_path = os.path.join(install_path, "ComfyUI_windows_portable_nvidia", "ComfyUI_windows_portable")
+        if os.path.exists(nested_path):
+            return nested_path
+        
+        # Check for direct structure (without parent dir)
+        direct_path = os.path.join(install_path, "ComfyUI_windows_portable")
+        if os.path.exists(direct_path):
+            return direct_path
+        
+        # Return nested path as default (will fail later with clear error)
+        return nested_path
+    
     def get_custom_nodes_path(self, install_path: str) -> str:
         """
         Get the path to the custom_nodes directory.
@@ -86,13 +109,8 @@ class NodeInstaller:
         Returns:
             str: Path to the custom_nodes directory
         """
-        return os.path.join(
-            install_path,
-            "ComfyUI_windows_portable_nvidia",
-            "ComfyUI_windows_portable",
-            "ComfyUI",
-            "custom_nodes"
-        )
+        base_path = self.find_comfyui_base(install_path)
+        return os.path.join(base_path, "ComfyUI", "custom_nodes")
     
     def create_installation_script(self, custom_nodes_path: str, repos: List[str]) -> Tuple[bool, str]:
         """
@@ -251,17 +269,16 @@ if __name__ == "__main__":
             logging.info(f"Running installation script...")
             
             # Get path to python inside the ComfyUI portable
-            comfyui_python = os.path.join(
-                install_path,
-                "ComfyUI_windows_portable_nvidia",
-                "ComfyUI_windows_portable",
-                "python_embeded",
-                "python.exe"
-            )
+            base_path = self.find_comfyui_base(install_path)
+            comfyui_python = os.path.join(base_path, "python_embeded", "python.exe")
             
             if not os.path.exists(comfyui_python):
-                comfyui_python = sys.executable
-                logging.warning(f"ComfyUI Python not found, using system Python: {comfyui_python}")
+                logging.error(f"ComfyUI embedded Python not found at: {comfyui_python}")
+                logging.error("Custom nodes require the embedded Python environment")
+                logging.error("Please run ComfyUI first or use the first-run initialization step")
+                return False, "Embedded Python not found. Run first-time initialization or use --skip-first-run if already initialized."
+            
+            logging.info(f"Using ComfyUI embedded Python: {comfyui_python}")
             
             script_path = os.path.join(custom_nodes_path, "install_custom_nodes.py")
             

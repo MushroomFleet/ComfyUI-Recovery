@@ -21,7 +21,9 @@ class SettingsManager:
             "comfyui_url": "https://github.com/comfyanonymous/ComfyUI/releases/download/v0.3.27/ComfyUI_windows_portable_nvidia.7z",
             "install_path": "",
             "models_path": "",
-            "repo_list_path": "RepoLists/default.txt"
+            "repo_list_path": "RepoLists/default.txt",
+            "cached_version": "",
+            "cached_archive_path": ""
         }
         self.load_settings()
     

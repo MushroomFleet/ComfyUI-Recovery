@@ -16,6 +16,7 @@ from downloader import Downloader
 from extractor import Extractor
 from symlink_manager import SymlinkManager
 from node_installer import NodeInstaller
+from first_run_initializer import FirstRunInitializer
 
 def setup_logging():
     """Set up logging configuration."""
@@ -89,6 +90,18 @@ def parse_arguments():
         "--skip-nodes",
         action="store_true",
         help="Skip installing custom nodes"
+    )
+    
+    parser.add_argument(
+        "--skip-first-run",
+        action="store_true",
+        help="Skip first-run initialization (embedded Python already exists)"
+    )
+    
+    parser.add_argument(
+        "--latest",
+        action="store_true",
+        help="Download the latest version from GitHub (bypass cache)"
     )
     
     return parser.parse_args()
@@ -174,14 +187,55 @@ def main():
     download_path = os.path.join(install_path, "comfyui.7z")
     
     if not args.skip_download:
-        logging.info(f"Downloading ComfyUI from {comfyui_url}")
-        success = downloader.download_with_retry(comfyui_url, download_path)
+        # Check for latest version from GitHub
+        latest_version, latest_url = downloader.get_latest_comfyui_version()
+        current_version = downloader.extract_version_from_url(comfyui_url)
+        cached_version = settings.get_setting("cached_version", "")
         
-        if not success:
-            logging.error("Failed to download ComfyUI")
-            sys.exit(1)
+        # Determine if we need to download
+        need_download = True
         
-        logging.info(f"Download completed: {download_path}")
+        # Check if we have a cached archive
+        if downloader.check_cached_archive(download_path) and not args.latest:
+            logging.info(f"Using cached ComfyUI archive (version {cached_version or current_version})")
+            
+            # Check if there's a newer version available
+            if latest_version and latest_version != cached_version and latest_version != current_version:
+                logging.info(f"\n{'='*60}")
+                logging.info(f"NEW VERSION AVAILABLE!")
+                logging.info(f"Current: {cached_version or current_version}")
+                logging.info(f"Latest:  {latest_version}")
+                logging.info(f"Use --latest flag to download the new version")
+                logging.info(f"{'='*60}\n")
+            
+            need_download = False
+        elif args.latest:
+            # User wants the latest version
+            if latest_version and latest_url:
+                logging.info(f"Downloading latest version: {latest_version}")
+                comfyui_url = latest_url
+                settings.update_setting("comfyui_url", latest_url)
+            else:
+                logging.warning("Could not determine latest version, using configured URL")
+        
+        # Download if needed
+        if need_download:
+            logging.info(f"Downloading ComfyUI from {comfyui_url}")
+            success = downloader.download_with_retry(comfyui_url, download_path)
+            
+            if not success:
+                logging.error("Failed to download ComfyUI")
+                sys.exit(1)
+            
+            # Update cached version info
+            downloaded_version = downloader.extract_version_from_url(comfyui_url)
+            if downloaded_version:
+                settings.update_setting("cached_version", downloaded_version)
+                settings.update_setting("cached_archive_path", download_path)
+                settings.save_settings()
+                logging.info(f"Cached version info updated: {downloaded_version}")
+            
+            logging.info(f"Download completed: {download_path}")
     else:
         logging.info("Skipping download (--skip-download)")
         if not os.path.exists(download_path):
@@ -206,7 +260,29 @@ def main():
     else:
         logging.info("Skipping extraction (--skip-extract)")
     
-    # Create symbolic links
+    # Run first-time initialization to set up embedded Python
+    if not args.skip_first_run:
+        logging.info("\n" + "="*60)
+        logging.info("FIRST-RUN INITIALIZATION")
+        logging.info("="*60)
+        
+        first_run_init = FirstRunInitializer()
+        success, message = first_run_init.run_first_initialization(install_path)
+        
+        if not success:
+            logging.error(f"First-run initialization failed: {message}")
+            logging.warning("Custom nodes may not install correctly without embedded Python")
+            if not confirm_action("Continue anyway?"):
+                logging.info("Installation cancelled by user")
+                sys.exit(1)
+        else:
+            logging.info(message)
+        
+        logging.info("="*60 + "\n")
+    else:
+        logging.info("Skipping first-run initialization (--skip-first-run)")
+    
+    # Create symbolic links (after first-run to replace default models directory)
     if not args.skip_symlink:
         logging.info("Setting up model symbolic links")
         success, message = symlink_manager.setup_model_symlinks(install_path, models_path)

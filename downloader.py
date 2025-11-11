@@ -3,6 +3,7 @@ import logging
 import requests
 import time
 from tqdm import tqdm
+import re
 
 class Downloader:
     """Handles downloading files with progress tracking and resume capability."""
@@ -13,6 +14,73 @@ class Downloader:
         self.session.headers.update({
             'User-Agent': 'ComfyUI-Recovery/1.0'
         })
+    
+    def extract_version_from_url(self, url):
+        """
+        Extract version number from ComfyUI download URL.
+        
+        Args:
+            url: The download URL
+            
+        Returns:
+            str: Version string (e.g., 'v0.3.27') or None
+        """
+        match = re.search(r'/v(\d+\.\d+\.\d+)/', url)
+        if match:
+            return f"v{match.group(1)}"
+        return None
+    
+    def get_latest_comfyui_version(self):
+        """
+        Get the latest ComfyUI release version from GitHub.
+        
+        Returns:
+            tuple: (version_string, download_url) or (None, None) on error
+        """
+        try:
+            api_url = "https://api.github.com/repos/comfyanonymous/ComfyUI/releases/latest"
+            response = self.session.get(api_url, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                version = data.get('tag_name', '')
+                
+                # Find the Windows portable NVIDIA asset
+                for asset in data.get('assets', []):
+                    if 'ComfyUI_windows_portable_nvidia.7z' in asset.get('name', ''):
+                        return version, asset.get('browser_download_url')
+                
+                logging.warning("Latest release found but no Windows portable NVIDIA asset")
+                return version, None
+            else:
+                logging.warning(f"Failed to get latest version from GitHub: {response.status_code}")
+                return None, None
+                
+        except Exception as e:
+            logging.warning(f"Error checking for latest version: {e}")
+            return None, None
+    
+    def check_cached_archive(self, archive_path):
+        """
+        Check if a cached archive exists and is valid.
+        
+        Args:
+            archive_path: Path to the cached archive
+            
+        Returns:
+            bool: True if archive exists and appears valid
+        """
+        if not os.path.exists(archive_path):
+            return False
+        
+        # Check if file has reasonable size (at least 100MB)
+        file_size = os.path.getsize(archive_path)
+        if file_size < 100 * 1024 * 1024:  # 100MB minimum
+            logging.warning(f"Cached archive appears incomplete: {file_size} bytes")
+            return False
+        
+        logging.info(f"Found cached archive: {archive_path} ({file_size / (1024**3):.2f} GB)")
+        return True
     
     def download_file(self, url, destination, chunk_size=8192):
         """

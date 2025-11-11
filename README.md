@@ -11,19 +11,23 @@ The ComfyUI Recovery System automates the process of downloading, installing, an
 ## ✨ Features
 
 - 🔄 Downloads ComfyUI Portable Windows release from GitHub
+- 💾 **Smart caching** - Reuses downloaded archives to save bandwidth and time
+- 🔔 **Version detection** - Checks for and notifies you of new ComfyUI releases
 - 📦 Extracts the downloaded archive to a specified location
 - 🔗 Creates symbolic links between your model storage and the ComfyUI models directory
+- 🚀 **Automatic first-run initialization** - Sets up ComfyUI's embedded Python environment before installing custom nodes
+- 🛡️ **Privilege detection** - Provides clear guidance for Windows symbolic link permissions
 - 🧩 Installs custom nodes from a configurable list of GitHub repositories
 - ⚙️ Saves your configuration for easy reuse
 - 📋 Comprehensive logging of all operations
-- 🚀 Command-line interface with various options for customization
+- 🎯 Command-line interface with various options for customization
 
 ## 📋 Requirements
 
 - Windows operating system
 - Python 3.6 or higher
 - Internet connection for downloading ComfyUI and custom nodes
-- Administrator privileges (required for symbolic link creation)
+- **Administrator privileges or Developer Mode enabled** (required for symbolic link creation)
 - Git (for custom node installation)
 - 7-Zip (optional, py7zr will be used if 7-Zip is not available)
 
@@ -39,6 +43,47 @@ cd ComfyUI-Recovery
 ```bash
 pip install -r requirements.txt
 ```
+
+## 🔑 Running with Administrator Privileges
+
+On Windows, creating symbolic links requires either administrator privileges or Developer Mode to be enabled. You have two options:
+
+### Option 1: Run as Administrator (Recommended for one-time use)
+
+1. Open PowerShell or Command Prompt as Administrator:
+   - Press `Win + X` and select "Windows PowerShell (Admin)" or "Command Prompt (Admin)"
+   - Or right-click on PowerShell/Command Prompt and select "Run as administrator"
+
+2. Navigate to the ComfyUI-Recovery directory:
+```powershell
+cd C:\Path\To\ComfyUI-Recovery
+```
+
+3. Run the script:
+```powershell
+python comfyui_recovery.py
+```
+
+### Option 2: Enable Developer Mode (Recommended for frequent use)
+
+**Windows 10:**
+1. Open Settings (Win + I)
+2. Go to "Update & Security" → "For developers"
+3. Enable "Developer Mode"
+4. Restart your computer (may not be required, but recommended)
+
+**Windows 11:**
+1. Open Settings (Win + I)
+2. Go to "Privacy & Security" → "For developers"
+3. Enable "Developer Mode"
+4. Restart your computer (may not be required, but recommended)
+
+Once Developer Mode is enabled, you can run the script normally without administrator privileges:
+```bash
+python comfyui_recovery.py
+```
+
+**Note:** If you encounter a symlink creation error, the script will provide detailed instructions on how to resolve it.
 
 ## 🚀 Usage
 
@@ -81,9 +126,11 @@ The following arguments are available:
 | `--models-path PATH` | Path to your model storage directory |
 | `--repo-list PATH` | Path to the repository list file (default: RepoLists/default.txt) |
 | `--force` | Force installation even if destination is not empty |
+| `--latest` | Download the latest version from GitHub (bypass cache) |
 | `--skip-download` | Skip downloading ComfyUI (use existing archive) |
 | `--skip-extract` | Skip extracting ComfyUI (use existing directory) |
 | `--skip-symlink` | Skip creating symbolic links |
+| `--skip-first-run` | Skip first-run initialization (use if embedded Python already exists) |
 | `--skip-nodes` | Skip installing custom nodes |
 
 ## 📖 Example Scenarios
@@ -95,10 +142,13 @@ python comfyui_recovery.py --install-path "D:\AI\ComfyUI" --models-path "E:\AI\M
 ```
 
 This will:
-1. Download ComfyUI Portable Windows
+1. Download ComfyUI Portable Windows (or use cached version)
 2. Extract it to `D:\AI\ComfyUI`
-3. Create a symbolic link from the ComfyUI models directory to `E:\AI\Models`
-4. Install custom nodes from the default repository list
+3. **Run first-time initialization** to set up the embedded Python environment
+4. Create a symbolic link from the ComfyUI models directory to `E:\AI\Models`
+5. Install custom nodes from the default repository list
+
+**Note:** The first-run initialization step automatically launches ComfyUI, waits for it to complete setup, then gracefully shuts it down. This creates the embedded Python environment and default directory structure. The symlink is then created after initialization to replace the default models folder with your existing model storage. This process typically takes 1-3 minutes depending on your system.
 
 ### Scenario 2: Setting Up a New Configuration
 
@@ -120,6 +170,22 @@ If you've already downloaded the ComfyUI archive but need to set up everything e
 ```bash
 python comfyui_recovery.py --skip-download --install-path "D:\AI\ComfyUI" --models-path "E:\AI\Models"
 ```
+
+### Scenario 4: Updating to the Latest Version
+
+To download and install the latest version of ComfyUI from GitHub (bypassing the cached archive):
+
+```bash
+python comfyui_recovery.py --latest
+```
+
+The script will automatically:
+1. Check GitHub for the latest ComfyUI release
+2. Download the newest version
+3. Update your installation with the latest files
+4. Update the cached version information
+
+**Note:** By default, the script uses cached archives to save bandwidth and time. The cached archive will be used on subsequent runs unless you use the `--latest` flag. If a newer version is available, the script will notify you and suggest using `--latest` to update.
 
 ## 🔧 Troubleshooting
 
@@ -148,17 +214,18 @@ Detailed logs are saved in the `logs` directory. If you encounter issues, check 
 
 ```
 ComfyUI-Recovery/
-├── comfyui_recovery.py   # Main script
-├── settings.py           # Settings management
-├── downloader.py         # Download functionality
-├── extractor.py          # Archive extraction
-├── symlink_manager.py    # Symbolic link management
-├── node_installer.py     # Custom node installation
-├── RepoLists/            # Repository list storage
-│   └── default.txt       # Default repository list
-├── settings.json         # User settings (created on first run)
-├── logs/                 # Log files
-└── README.md             # This documentation
+├── comfyui_recovery.py      # Main script
+├── settings.py              # Settings management
+├── downloader.py            # Download functionality
+├── extractor.py             # Archive extraction
+├── symlink_manager.py       # Symbolic link management
+├── first_run_initializer.py # First-run initialization handler
+├── node_installer.py        # Custom node installation
+├── RepoLists/               # Repository list storage
+│   └── default.txt          # Default repository list
+├── settings.json            # User settings (created on first run)
+├── logs/                    # Log files
+└── README.md                # This documentation
 ```
 
 ## 📝 License
