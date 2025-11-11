@@ -8,19 +8,32 @@ A complete system for automated recovery and setup of ComfyUI Portable Windows i
 
 The ComfyUI Recovery System automates the process of downloading, installing, and configuring ComfyUI. It handles creating symbolic links to your model storage and installing custom nodes from a repository list. This allows you to quickly recover from a system failure or create a clean installation with minimal effort.
 
+### How It Works
+
+The recovery system follows a carefully orchestrated workflow:
+
+1. **Download Management** - Downloads ComfyUI from GitHub or uses a cached copy (saves 1.7GB on subsequent runs)
+2. **Intelligent Extraction** - Extracts the archive with automatic path detection for different structures
+3. **First-Run Initialization** - Automatically launches ComfyUI to create the embedded Python environment
+4. **Smart Symlink Creation** - Links your model storage after initialization (prevents conflicts)
+5. **Custom Node Installation** - Installs nodes using the embedded Python environment
+
+All steps include comprehensive error handling with clear, actionable guidance if issues occur.
+
 ## ✨ Features
 
-- 🔄 Downloads ComfyUI Portable Windows release from GitHub
-- 💾 **Smart caching** - Reuses downloaded archives to save bandwidth and time
-- 🔔 **Version detection** - Checks for and notifies you of new ComfyUI releases
-- 📦 Extracts the downloaded archive to a specified location
-- 🔗 Creates symbolic links between your model storage and the ComfyUI models directory
-- 🚀 **Automatic first-run initialization** - Sets up ComfyUI's embedded Python environment before installing custom nodes
-- 🛡️ **Privilege detection** - Provides clear guidance for Windows symbolic link permissions
-- 🧩 Installs custom nodes from a configurable list of GitHub repositories
-- ⚙️ Saves your configuration for easy reuse
-- 📋 Comprehensive logging of all operations
-- 🎯 Command-line interface with various options for customization
+- 🔄 **Automated Downloads** - Fetches ComfyUI Portable Windows release from GitHub
+- 💾 **Smart Caching** - Reuses downloaded archives to save bandwidth and time (1.7GB saved per run!)
+- 🔔 **Version Detection** - Automatically checks for and notifies you of new ComfyUI releases
+- 📦 **Intelligent Extraction** - Handles different archive structures automatically
+- 🔍 **Flexible Path Detection** - Works with various ComfyUI installation directory structures
+- 🚀 **Automatic First-Run Initialization** - Sets up ComfyUI's embedded Python environment before installing custom nodes
+- 🔗 **Smart Symlink Management** - Creates symbolic links to your model storage (after initialization to prevent conflicts)
+- 🛡️ **Privilege Detection** - Provides clear, actionable guidance for Windows symbolic link permissions
+- 🧩 **Custom Node Installation** - Installs nodes from a configurable list of GitHub repositories
+- ⚙️ **Configuration Persistence** - Saves your settings for easy reuse
+- 📋 **Comprehensive Logging** - Detailed logs of all operations for troubleshooting
+- 🎯 **Flexible CLI** - Command-line interface with various options for customization
 
 ## 📋 Requirements
 
@@ -195,16 +208,31 @@ The script will automatically:
    - Ensure you're running the script with administrator privileges
    - Check that both source and destination paths exist
    - Verify Windows Developer Mode is enabled or you have the appropriate permissions
+   - The script provides detailed guidance on how to resolve privilege issues
 
 2. **Custom Node Installation Fails**
    - Ensure Git is installed and in your PATH
    - Check internet connectivity
    - Verify the GitHub repository URLs are correct and accessible
+   - Ensure first-run initialization completed successfully (embedded Python must exist)
 
 3. **Extraction Fails**
    - Ensure py7zr is installed or 7-Zip is available on your system
    - Check that the destination path is writable
    - Verify the downloaded archive is not corrupted
+
+4. **Path Detection Issues**
+   - The system automatically detects both nested and direct extraction structures
+   - No manual configuration needed - works with various ComfyUI archive formats
+   - If paths aren't detected, check that extraction completed successfully
+
+### System Compatibility
+
+The recovery system intelligently handles different ComfyUI extraction structures:
+- **Nested structure**: `install_path/ComfyUI_windows_portable_nvidia/ComfyUI_windows_portable/...`
+- **Direct structure**: `install_path/ComfyUI_windows_portable/...`
+
+All path detection is automatic - the system will find the correct directories regardless of how the archive was extracted.
 
 ### Log Files
 
