@@ -1,6 +1,8 @@
 {
     "comfyui_url": "https://github.com/comfyanonymous/ComfyUI/releases/download/v0.3.27/ComfyUI_windows_portable_nvidia.7z",
-    "install_path": "C:\\MACHINES01",
-    "models_path": "C:\\MACHINES00\\ComfyUI_windows_portable_nvidia\\ComfyUI_windows_portable\\ComfyUI\\models",
-    "repo_list_path": "RepoLists/default.txt"
+    "install_path": "K:\\MACHINES15",
+    "models_path": "K:\\MACHINES11\\ComfyUI_windows_portable_nvidia\\ComfyUI_windows_portable\\ComfyUI\\models",
+    "repo_list_path": "RepoLists/default.txt",
+    "cached_version": "v0.3.27",
+    "cached_archive_path": "K:\\MACHINES15\\comfyui.7z"
 }
